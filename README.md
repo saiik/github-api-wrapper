@@ -33,6 +33,14 @@ var_dump($github->getRepo('REPO_OWNER', 'repo'));
 $repo = $github->getRepo('saiik', 'dodu');
 var_dump($github->getRepoCodeCount($repo));
 
+// Get commits
+$repo = $github->getRepo('saiik', 'dodu');
+var_dump($github->getCommits($repo));
+
+// Get readme file (content)
+$repo = $github->getRepo('saiik', 'dodu');
+var_dump($github->getReadme($repo));
+
 ```
 
 ### more coming soon

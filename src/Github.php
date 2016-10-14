@@ -57,11 +57,11 @@ class Github {
 		if(is_null($user))
 			return json_decode($this->request(self::METHOD_GET, 'user'));
 		else
-			return json_decode($this->request(self::METHOD_GET, 'users/' . $user));
+			return json_decode($this->request(self::METHOD_GET, sprintf('users/%s', $user)));
 	}
 
 	public function getRepo(string $owner, string $repo) {
-		$get = json_decode($this->request(self::METHOD_GET, 'repos/' . $owner . '/' . $repo));
+		$get = json_decode($this->request(self::METHOD_GET, sprintf('repos/%s/%s', $owner, $repo)));
 		
 		return new Repository($get);
 	}
@@ -78,8 +78,19 @@ class Github {
 		return $newRepos;		
 	}
 
+	public function getCommits(Repository $repo) {
+		return json_decode($this->request(self::METHOD_GET, sprintf('repos/%s/%s/commits', $repo->owner, $repo->name)));
+	}
+
+	public function getReadMe(Repository $repo) {
+		$readme = json_decode($this->request(self::METHOD_GET, sprintf('repos/%s/%s/readme', $repo->owner, $repo->name)));
+		$content = base64_decode($readme->content);
+
+		return $content ?? false;
+	}
+
 	public function getRepoCodeCount(Repository $repo) {
-		$freqs = json_decode($this->request(self::METHOD_GET, 'repos/' . $repo->owner . '/' . $repo->name . '/stats/code_frequency'));
+		$freqs = json_decode($this->request(self::METHOD_GET, sprintf('repos/%s/%s/stats/code_frequency', $repo->owner, $repo->name)));
 		$total = 0;
 
 		foreach($freqs as $freq) {
@@ -95,7 +106,7 @@ class Github {
 			$this->url ?? '' . $url, 
 			[
 				'headers' => [
-					'Authorization' => 'token ' . $this->token
+					'Authorization' => sprintf('token %s', $this->token)
 				]
 			]
 		);
