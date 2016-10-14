@@ -55,19 +55,19 @@ class Github {
 
 	public function getUser(string $user = null) {
 		if(is_null($user))
-			return json_decode($this->request(self::METHOD_GET, 'user'));
+			return $this->request('user');
 		else
-			return json_decode($this->request(self::METHOD_GET, sprintf('users/%s', $user)));
+			return $this->request(sprintf('users/%s', $user));
 	}
 
 	public function getRepo(string $owner, string $repo) {
-		$get = json_decode($this->request(self::METHOD_GET, sprintf('repos/%s/%s', $owner, $repo)));
+		$get = $this->request(sprintf('repos/%s/%s', $owner, $repo));
 		
 		return new Repository($get);
 	}
 
 	public function getRepos() {
-		$repos = json_decode($this->request(self::METHOD_GET, 'user/repos'));
+		$repos = $this->request('user/repos');
 
 		$newRepos = [];
 
@@ -79,18 +79,18 @@ class Github {
 	}
 
 	public function getCommits(Repository $repo) {
-		return json_decode($this->request(self::METHOD_GET, sprintf('repos/%s/%s/commits', $repo->owner, $repo->name)));
+		return $this->request(sprintf('repos/%s/%s/commits', $repo->owner, $repo->name));
 	}
 
 	public function getReadMe(Repository $repo) {
-		$readme = json_decode($this->request(self::METHOD_GET, sprintf('repos/%s/%s/readme', $repo->owner, $repo->name)));
+		$readme = $this->request(sprintf('repos/%s/%s/readme', $repo->owner, $repo->name));
 		$content = base64_decode($readme->content);
 
 		return $content ?? false;
 	}
 
 	public function getRepoCodeCount(Repository $repo) {
-		$freqs = json_decode($this->request(self::METHOD_GET, sprintf('repos/%s/%s/stats/code_frequency', $repo->owner, $repo->name)));
+		$freqs = $this->request(sprintf('repos/%s/%s/stats/code_frequency', $repo->owner, $repo->name));
 		$total = 0;
 
 		foreach($freqs as $freq) {
@@ -100,7 +100,7 @@ class Github {
 		return $total;
 	}
 
-	protected function request($method = self::METHOD_GET, $url) {
+	protected function request($url, $method = self::METHOD_GET) {
 		$request = $this->client->request(
 			$method, 
 			$this->url ?? '' . $url, 
@@ -115,7 +115,7 @@ class Github {
 			$body = $request->getBody();
 			$content = $body->getContents();
 
-			return $content;
+			return json_decode($content);
 		} elseif($request->getStatusCode() == self::STATUS_ACCEPTED) {
 			return $this->request($method, $url);
 		} else {
