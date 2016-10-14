@@ -1,0 +1,19 @@
+{
+    "name": "volldigital/github-stats",
+    "description": "Get Github Repo stats",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Tobias Fuchs",
+            "email": "tobiasf@voll.digital"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^6.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "VOLL\\":        "src/"
+        }
+    }
+}
