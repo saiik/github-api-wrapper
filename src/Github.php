@@ -10,9 +10,28 @@ use GuzzleHttp\{
 
 class Github {
 
+	/**
+	 * @var GuzzleHttp\Client $client
+	 *
+	 */
 	private $client;
+
+	/**
+	 * @var string $token
+	 *
+	 */
 	private $token;
+
+	/**
+	 * @var string $uri
+	 *
+	 */	
 	private $uri = 'https://api.github.com/';
+
+	/**
+	 * @var string $url
+	 *
+	 */	
 	private $url;
 
 	const METHOD_GET = 'GET';
@@ -38,12 +57,25 @@ class Github {
 		);
 	}
 
+	/**
+	 * Set API url
+	 *
+	 * @param string $url
+	 * @return boolean
+	 */
 	public function setUrl(string $url) {
 		$this->url = $url;
 
 		return true;
 	}
 
+	/**
+	 * Set auth token
+	 *
+	 * @param string $token
+	 * @return boolean
+ 	 * @throws GithubException
+	 */
 	public function setAuth(string $token) {
 		if(is_null($token))
 			throw new GithubException('No auth token');
@@ -53,6 +85,12 @@ class Github {
 		return true;
 	}
 
+	/**
+	 * Get github user
+	 *
+	 * @param string $user
+	 * @return array
+	 */
 	public function getUser(string $user = null) {
 		if(is_null($user))
 			return $this->request('user');
@@ -60,12 +98,24 @@ class Github {
 			return $this->request(sprintf('users/%s', $user));
 	}
 
+	/**
+	 * Get a specific repository
+	 *
+	 * @param string $owner
+	 * @param string $repo
+	 * @return VOLL\Repository
+	 */
 	public function getRepo(string $owner, string $repo) {
 		$get = $this->request(sprintf('repos/%s/%s', $owner, $repo));
 		
 		return new Repository($get);
 	}
 
+	/**
+	 * Get all repositories for user
+	 *
+	 * @return array<VOLL\Repository>
+	 */
 	public function getRepos() {
 		$repos = $this->request('user/repos');
 
@@ -78,10 +128,22 @@ class Github {
 		return $newRepos;		
 	}
 
+	/**
+	 * Get last commits
+	 *
+	 * @param VOLL\Repository $repo
+	 * @return array
+	 */
 	public function getCommits(Repository $repo) {
 		return $this->request(sprintf('repos/%s/%s/commits', $repo->owner, $repo->name));
 	}
 
+	/**
+	 * Get README.md 
+	 *
+	 * @param VOLL\Repository
+	 * @return string
+	 */
 	public function getReadMe(Repository $repo) {
 		$readme = $this->request(sprintf('repos/%s/%s/readme', $repo->owner, $repo->name));
 		$content = base64_decode($readme->content);
@@ -89,6 +151,12 @@ class Github {
 		return $content ?? false;
 	}
 
+	/**
+	 * Get amount of code lines for a repo
+	 *
+	 * @param VOLL\Repository $repo
+	 * @return int
+	 */
 	public function getRepoCodeCount(Repository $repo) {
 		$freqs = $this->request(sprintf('repos/%s/%s/stats/code_frequency', $repo->owner, $repo->name));
 		$total = 0;
@@ -100,6 +168,14 @@ class Github {
 		return $total;
 	}
 
+	/**
+	 * Send a request to api
+	 *
+	 * @param string $url
+	 * @param string $method
+	 * @return array
+	 * @throws GithubException
+	 */
 	protected function request($url, $method = self::METHOD_GET) {
 		$request = $this->client->request(
 			$method, 
