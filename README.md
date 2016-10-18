@@ -10,16 +10,11 @@ Connect to github and fetch user / repository data. It's __easy__ and __fast__!
 
 ## Install
 
-### With composer
+Run
 
 ```
 composer require saiik/github-api-wrapper
 ```
-
-### Without composer
-
-Download a release version from github and copy it into your folder. After that load the "__vendor/autoload.php__" into your project.
-
 
 ## Usage
 
