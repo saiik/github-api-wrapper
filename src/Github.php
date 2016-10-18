@@ -2,12 +2,18 @@
 
 declare(strict_types=1);
 
-namespace VOLL;
+namespace saiik;
 
 use GuzzleHttp\{
-	Client
+	Client,
+	Exception\ClientException
 };
 
+/**
+ * @package saiik\
+ * @author Tobias Fuchs <saikon@hotmail.de>
+ * @version 1.0
+ */
 class Github {
 
 	/**
@@ -151,6 +157,18 @@ class Github {
 		return $content ?? false;
 	}
 
+	/** 
+	 * Parse a README.md file
+	 *
+	 * @param string $readMe
+	 * @return string
+	 */
+	public function parseReadMe(string $readMe) {
+		$post = $this->request('markdown', ['text' => $readMe], self::METHOD_POST);
+		
+		return $post;
+	}
+
 	/**
 	 * Get amount of code lines for a repo
 	 *
@@ -176,26 +194,84 @@ class Github {
 	 * @return array
 	 * @throws GithubException
 	 */
-	protected function request($url, $method = self::METHOD_GET) {
-		$request = $this->client->request(
-			$method, 
-			$this->url ?? '' . $url, 
-			[
-				'headers' => [
-					'Authorization' => sprintf('token %s', $this->token)
-				]
-			]
-		);
+	protected function request($url, $post = null, $method = self::METHOD_GET) {
+		$statusCode = 0;
 
-		if($request->getStatusCode() === self::STATUS_OK) {
+		switch($method) {
+			case self::METHOD_GET:
+				try {
+					$request = $this->client->request(
+						$method, 
+						$this->url ?? '' . $url, 
+						[
+							'headers' => [
+								'Authorization' => sprintf('token %s', $this->token)
+							]
+						]
+					);
+				} catch(ClientException $e) {
+					$statusCode = $e->getResponse()->getStatusCode();
+				}
+			break;
+			case self::METHOD_POST:
+				$json = json_encode($post);
+				
+				try {
+					$request = $this->client->post(
+						$this->url ?? '' . $url,
+						[
+							'body' => $json,
+							'headers' => [
+								'Authorization' => sprintf('token %s', $this->token),
+							]
+						]
+					);
+				} catch(ClientException $e) {
+					$statusCode = $e->getResponse()->getStatusCode();
+				}
+
+			break;
+			default:
+				return;
+			break;
+		}
+
+		if($statusCode === 0 && $request->getStatusCode() === self::STATUS_OK) {
 			$body = $request->getBody();
 			$content = $body->getContents();
 
-			return json_decode($content);
-		} elseif($request->getStatusCode() == self::STATUS_ACCEPTED) {
+			$header = $request->getHeaders();
+			$type = explode(";", $header['Content-Type'][0]);
+			$type = $type[0];
+
+			switch($type) {
+				case 'application/json':
+					return json_decode($content);
+				break;
+				case 'text/html':
+					return $content;
+				break;
+				default:
+					return;
+				break;
+			}
+		} elseif($statusCode === 0 && $request->getStatusCode() == self::STATUS_ACCEPTED) {
 			return $this->request($method, $url);
 		} else {
-			throw new GithubException('Status Code: ' . $request->getStatusCode());
+			$statusCode = $statusCode = 0 ? $request->getStatusCode() : $statusCode;
+			switch((int)$statusCode) {
+				case self::STATUS_NOTFOUND:
+					throw new GithubException(
+						'Requested page not found '.PHP_EOL.' URL: ' . $url
+					);
+				break;
+				case self::STATUS_AUTH:
+					throw new GithubException('Invalid access token, please generate your access token here: https://github.com/settings/tokens');
+				break;
+				default:
+					throw new GithubException('Status Code: ' . $statusCode);
+				break;
+			}
 		}
 	}
 

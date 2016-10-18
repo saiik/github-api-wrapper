@@ -1,46 +1,87 @@
-# VOLL Github Wrapper
+# Github API Wrapper
 
-Connect to github and fetch user / repository data
+Connect to github and fetch user / repository data. It's __easy__ and __fast__!
+
+## Requirements
+
+* __PHP 7__
+* GuzzleHTTP
+* Composer
 
 ## Install
 
-Run
+### With composer
+
 ```
-composer install
+composer require saiik/github-api-wrapper
 ```
+
+### Without composer
+
+Download a release version from github and copy it into your folder. After that load the "__vendor/autoload.php__" into your project.
+
 
 ## Usage
 
+__Connect to github__
 ```php
 require_once 'vendor/autoload.php';
 
-// Generate your auth key here: https://github.com/settings/tokens
-$github = new \VOLL\Github('YOUR_AUTH_KEY');
+$token = 'YOUR_GITHUB_TOKEN';
 
-// Get your user profile
-var_dump($github->getUser());
-
-// Get a specifiy user profile
-var_dump($github->getUser('xyz'));
-
-// Get all your repositories
-var_dump($github->getRepos());
-
-// Get a specific repository (you need access to it)
-var_dump($github->getRepo('REPO_OWNER', 'repo'));
-
-// Get amount of code lines in a repository
-$repo = $github->getRepo('saiik', 'dodu');
-var_dump($github->getRepoCodeCount($repo));
-
-// Get commits
-$repo = $github->getRepo('saiik', 'dodu');
-var_dump($github->getCommits($repo));
-
-// Get readme file (content)
-$repo = $github->getRepo('saiik', 'dodu');
-var_dump($github->getReadme($repo));
-
+$github = new \saiik\Github($token);
 ```
 
-### more coming soon
+__Get your user profile or a specifiy user profile__
+```php
+$me = $github->getUser();
+
+// OR
+
+$user = $github->getUser('someone');
+```
+
+__Get all user repositories__
+```php
+$repos = $github->getRepos();
+```
+
+__Get a specify repository__
+```php
+$repo = $github->getRepo('REPO_OWNER', 'REPO_NAME');
+```
+
+__Get all commits from a repository__
+```php
+$repo = $github->getRepo('saiik', 'dodu');
+$commits = $github->getCommits($repo);
+```
+
+__Get README file from a repository__
+```php
+$repo = $github->getRepo('saiik', 'dodu');
+$readme = $github->getReadMe($repo);
+```
+
+__Parse README file__
+```php
+$repo = $github->getRepo('saiik', 'dodu');
+$readme = $github->getReadMe($repo);
+$parsed = $github->parseReadMe($readme); // post request to github
+```
+
+__Get the amount of codes lines for a repository__
+```php
+$repo = $github->getRepo('saiik', 'dodu');
+$count = $github->getRepoCodeCount($repo);
+```
+
+See? It's pretty easy and not overloaded.
+
+## Changelog
+
+-
+
+## License
+
+__GNU GPLv3__

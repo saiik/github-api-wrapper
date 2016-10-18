@@ -1,19 +1,23 @@
 {
-    "name": "volldigital/github-stats",
-    "description": "Get Github Repo stats",
-    "type": "project",
+    "name": "saiik/github-api-wrapper",
+    "description": "PHP7 Github API Wrapper",
+    "keywords": ["github", "api"],
+    "type": "library",
     "authors": [
         {
             "name": "Tobias Fuchs",
-            "email": "tobiasf@voll.digital"
+            "email": "saikon@hotmail.de"
         }
     ],
+    "minimum-stability": "stable",
+    "license": "GPLv3",
     "require": {
+        "php": ">=7.0",
         "guzzlehttp/guzzle": "^6.2"
     },
     "autoload": {
         "psr-4": {
-            "VOLL\\":        "src/"
+            "saiik\\":        "src/"
         }
     }
 }
