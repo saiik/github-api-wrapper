@@ -109,7 +109,7 @@ class Github {
 	 *
 	 * @param string $owner
 	 * @param string $repo
-	 * @return VOLL\Repository
+	 * @return \saiik\Repository
 	 */
 	public function getRepo(string $owner, string $repo) {
 		$get = $this->request(sprintf('repos/%s/%s', $owner, $repo));
@@ -120,7 +120,7 @@ class Github {
 	/**
 	 * Get all repositories for user
 	 *
-	 * @return array<VOLL\Repository>
+	 * @return array<\saiik\Repository>
 	 */
 	public function getRepos() {
 		$repos = $this->request('user/repos');
@@ -137,17 +137,36 @@ class Github {
 	/**
 	 * Get last commits
 	 *
-	 * @param VOLL\Repository $repo
+	 * @param \saiik\Repository $repo
 	 * @return array
 	 */
 	public function getCommits(Repository $repo) {
-		return $this->request(sprintf('repos/%s/%s/commits', $repo->owner, $repo->name));
+		$commits = $this->request(sprintf('repos/%s/%s/commits', $repo->owner, $repo->name));
+
+		$commitsOut = [];
+		foreach($commits as $commit) {
+			$commitsOut[] = new Commit($commit, $repo);
+		}
+
+		return $commitsOut;
+	}
+
+	/**
+	 * get a specific commit
+	 *
+	 * @param \saiik\Commit $commit
+	 * @return \stdClass
+	 */
+	public function getCommit(Commit $commit) {
+		$commit = $this->request(sprintf('repos/%s/%s/git/commits/%s', $commit->rOwner, $commit->rName, $commit->sha));
+
+		return $commit;
 	}
 
 	/**
 	 * Get README.md 
 	 *
-	 * @param VOLL\Repository
+	 * @param \saiik\Repository
 	 * @return string
 	 */
 	public function getReadMe(Repository $repo) {
@@ -172,7 +191,7 @@ class Github {
 	/**
 	 * Get amount of code lines for a repo
 	 *
-	 * @param VOLL\Repository $repo
+	 * @param \saiik\Repository $repo
 	 * @return int
 	 */
 	public function getRepoCodeCount(Repository $repo) {
@@ -184,6 +203,17 @@ class Github {
 		}
 
 		return $total;
+	}
+
+	/**
+	 * Get your current rate limit
+	 *
+	 * @return array
+	 */
+	public function getRateLimit() {
+		$limit = $this->request('rate_limit');
+
+		return $limit ?? false;
 	}
 
 	/**
