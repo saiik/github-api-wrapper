@@ -52,6 +52,13 @@ $repo = $github->getRepo('saiik', 'dodu');
 $commits = $github->getCommits($repo);
 ```
 
+__Get a specific commit__
+```php
+$repo = $github->getRepo('saiik', 'dodu');
+$commits = $github->getCommits($repo);
+$commit = $github->getCommit($commits[0]);
+```
+
 __Get README file from a repository__
 ```php
 $repo = $github->getRepo('saiik', 'dodu');
