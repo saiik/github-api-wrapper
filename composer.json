@@ -9,7 +9,6 @@
             "email": "saikon@hotmail.de"
         }
     ],
-    "minimum-stability": "stable",
     "license": "GPLv3",
     "require": {
         "php": ">=7.0",
