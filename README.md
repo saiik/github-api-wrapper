@@ -71,6 +71,8 @@ $repo = $github->getRepo('saiik', 'dodu');
 $count = $github->getRepoCodeCount($repo);
 ```
 
+__more coming soon__
+
 See? It's pretty easy and not overloaded.
 
 ## Changelog
