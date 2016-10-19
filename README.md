@@ -78,6 +78,37 @@ $repo = $github->getRepo('saiik', 'dodu');
 $count = $github->getRepoCodeCount($repo);
 ```
 
+__Create a repository__
+```php
+$github->createRepository([
+	'name' => 'REPOSITORY_NAME'
+	/* .. Please visit https://developer.github.com/v3/repos/#create for more information about creating a repository .. */ 
+])
+```
+
+__Get all languages used in a repository__
+```php
+$repo = $github->getRepo('saiik', 'dodo-cms');
+var_dump($github->getRepoLanguages($repo));
+```
+
+__Get all contributors for a repository__
+```php
+$repo = $github->getRepo('saiik', 'dodo-cms');
+var_dump($github->getRepoContributors($repo));
+```
+
+__Get all teams for a repository__
+```php
+$repo = $github->getRepo('saiik', 'dodo-cms');
+var_dump($github->getRepoTeams($repo));
+```
+
+__Get your API rate limit__
+```php
+var_dump($github->getRateLimit());
+```
+
 __more coming soon__
 
 See? It's pretty easy and not overloaded.

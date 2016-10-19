@@ -49,6 +49,8 @@ class Github {
 	const STATUS_ACCEPTED = 202;
 	const STATUS_AUTH = 401;
 	const STATUS_NOTFOUND = 404;
+	const STATUS_ENTITY = 422;
+	const STATUS_CREATED = 201;
 
 	public function __construct(string $token) {
 		if(is_null($token))
@@ -102,6 +104,21 @@ class Github {
 			return $this->request('user');
 		else
 			return $this->request(sprintf('users/%s', $user));
+	}
+
+	/**
+	 * Create a repository
+	 *
+	 * @param array $data
+	 * @return boolean
+	 */
+	public function createRepository(array $data) {
+		if(!isset($data['name'])) 
+			return false;
+
+		$post = $this->request('user/repos', $data, self::METHOD_POST);
+
+		return $post;
 	}
 
 	/**
@@ -206,6 +223,68 @@ class Github {
 	}
 
 	/**
+	 * Returns all programming languages used in a repository
+	 *
+	 * @param \saiik\Repoistory $repo
+	 * @return array | boolean
+	 */
+	public function getRepoLanguages(Repository $repo) {
+		$lang = $this->request(sprintf('repos/%s/%s/languages', $repo->owner, $repo->name));
+
+		if($lang instanceof \stdClass) {
+			$return = [];
+			$i = 0;
+			foreach($lang as $language => $bytes) {
+				$return[$i]['lang'] = $language;
+				$return[$i]['bytes'] = $bytes;
+				$i++;
+			}
+
+			return $return;
+		} 
+
+		return false;
+	}
+
+	/**
+	 * List all contributors for a repository
+	 *
+	 * @param \saiik\Repository $repo
+	 * @return array | boolean
+	 */
+	public function getRepoContributors(Repository $repo) {
+		$cont = $this->request(sprintf('repos/%s/%s/contributors', $repo->owner, $repo->name));
+
+		if(is_array($cont) && count($cont) > 0) {
+			$users = [];
+			$i = 0;
+			foreach($cont as $contributor) {
+				$users[$i]['name'] = $contributor->login;
+				$users[$i]['url'] = $contributor->html_url;
+				$users[$i]['contributions'] = $contributor->contributions; 
+
+				$i++;
+			}
+
+			return $users;
+		}
+
+		return false;
+	}
+
+	/** 
+	 * List all teams for the repository
+	 *
+	 * @param \saiik\Repository $repo
+	 * @return array
+	 */
+	public function getRepoTeams(Repository $repo) {
+		$teams = $this->request(sprintf('repos/%s/%s/teams', $repo->owner, $repo->name));
+
+		return $teams;
+	}
+
+	/**
 	 * Get your current rate limit
 	 *
 	 * @return array
@@ -287,6 +366,8 @@ class Github {
 			}
 		} elseif($statusCode === 0 && $request->getStatusCode() == self::STATUS_ACCEPTED) {
 			return $this->request($method, $url);
+		} elseif($statusCode === 0 && $request->getStatusCode() == self::STATUS_CREATED) {
+			return true;
 		} else {
 			$statusCode = $statusCode = 0 ? $request->getStatusCode() : $statusCode;
 			switch((int)$statusCode) {
@@ -296,10 +377,19 @@ class Github {
 					);
 				break;
 				case self::STATUS_AUTH:
-					throw new GithubException('Invalid access token, please generate your access token here: https://github.com/settings/tokens');
+					throw new GithubException(
+						'Invalid access token, please generate your access token here: https://github.com/settings/tokens'
+					);
+				break;
+				case self::STATUS_ENTITY:
+					throw new GithubException(
+						'Unprocessable Entity'
+					);
 				break;
 				default:
-					throw new GithubException('Status Code: ' . $statusCode);
+					throw new GithubException(
+						'Status Code: ' . $statusCode
+					);
 				break;
 			}
 		}
