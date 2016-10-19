@@ -47,6 +47,7 @@ $repos = $github->getRepos();
 
 __Get a specify repository__
 ```php
+// you need to have access to the repository
 $repo = $github->getRepo('REPO_OWNER', 'REPO_NAME');
 ```
 
