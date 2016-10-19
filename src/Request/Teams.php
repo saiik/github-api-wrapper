@@ -112,6 +112,6 @@ trait Teams {
 	public function deleteTeamRepo(int $team, Repo $repo) {
 		$repo = $this->request(sprintf('teams/%u/repos/%s/%s', $team, $repo->owner, $repo->name));
 
-		return $repo
+		return $repo;
 	}
 }

@@ -10,7 +10,7 @@ Connect to github and fetch user / repository data. It's __easy__ and __fast__!
 
 ## Install
 
-Run
+Install with composer, run:
 
 ```php
 composer require saiik/github-api-wrapper

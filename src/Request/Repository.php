@@ -6,7 +6,7 @@ namespace saiik\Request;
 
 use saiik\Github\{
 	Repository as Repo
-}
+};
 
 /**
  * @package saiik\Request
