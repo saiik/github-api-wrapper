@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace saiik\Request;
 
+use saiik\Github\{
+	Repository as Repo
+}
+
 /**
  * @package saiik\Request
  * @author Tobias Fuchs <saikon@hotmail.de>
@@ -31,18 +35,18 @@ trait Repository {
 	 *
 	 * @param string $owner
 	 * @param string $repo
-	 * @return \saiik\Repository
+	 * @return \saiik\Github\Repository
 	 */
 	public function getRepo(string $owner, string $repo) {
 		$get = $this->request(sprintf('repos/%s/%s', $owner, $repo));
 		
-		return new Repository($get);
+		return new Repo($get);
 	}
 
 	/**
 	 * Get all repositories for user
 	 *
-	 * @return array<\saiik\Repository>
+	 * @return array<\saiik\Github\Repository>
 	 */
 	public function getRepos() {
 		$repos = $this->request('user/repos');
@@ -50,7 +54,7 @@ trait Repository {
 		$newRepos = [];
 
 		foreach($repos as $repo) {
-			$newRepos[$repo->owner->login][$repo->name] = new Repository($repo);		
+			$newRepos[$repo->owner->login][$repo->name] = new Repo($repo);		
 		}
 
 		return $newRepos;		
@@ -59,10 +63,10 @@ trait Repository {
 	/**
 	 * Get last commits
 	 *
-	 * @param \saiik\Repository $repo
+	 * @param \saiik\Github\Repository $repo
 	 * @return array
 	 */
-	public function getCommits(Repository $repo) {
+	public function getCommits(Repo $repo) {
 		$commits = $this->request(sprintf('repos/%s/%s/commits', $repo->owner, $repo->name));
 
 		$commitsOut = [];
@@ -88,10 +92,10 @@ trait Repository {
 	/**
 	 * Get README.md 
 	 *
-	 * @param \saiik\Repository
+	 * @param \saiik\Github\Repository
 	 * @return string
 	 */
-	public function getReadMe(Repository $repo) {
+	public function getReadMe(Repo $repo) {
 		$readme = $this->request(sprintf('repos/%s/%s/readme', $repo->owner, $repo->name));
 		$content = base64_decode($readme->content);
 
@@ -101,10 +105,10 @@ trait Repository {
 	/**
 	 * Get amount of code lines for a repo
 	 *
-	 * @param \saiik\Repository $repo
+	 * @param \saiik\Github\Repository $repo
 	 * @return int
 	 */
-	public function getRepoCodeCount(Repository $repo) {
+	public function getRepoCodeCount(Repo $repo) {
 		$freqs = $this->request(sprintf('repos/%s/%s/stats/code_frequency', $repo->owner, $repo->name));
 		$total = 0;
 
@@ -118,10 +122,10 @@ trait Repository {
 	/**
 	 * Returns all programming languages used in a repository
 	 *
-	 * @param \saiik\Repoistory $repo
+	 * @param \saiik\Github\Repository $repo
 	 * @return array | boolean
 	 */
-	public function getRepoLanguages(Repository $repo) {
+	public function getRepoLanguages(Repo $repo) {
 		$lang = $this->request(sprintf('repos/%s/%s/languages', $repo->owner, $repo->name));
 
 		if($lang instanceof \stdClass) {
@@ -142,10 +146,10 @@ trait Repository {
 	/**
 	 * List all contributors for a repository
 	 *
-	 * @param \saiik\Repository $repo
+	 * @param \saiik\Github\Repository $repo
 	 * @return array | boolean
 	 */
-	public function getRepoContributors(Repository $repo) {
+	public function getRepoContributors(Repo $repo) {
 		$cont = $this->request(sprintf('repos/%s/%s/contributors', $repo->owner, $repo->name));
 
 		if(is_array($cont) && count($cont) > 0) {
@@ -168,10 +172,10 @@ trait Repository {
 	/** 
 	 * List all teams for the repository
 	 *
-	 * @param \saiik\Repository $repo
+	 * @param \saiik\Github\Repository $repo
 	 * @return array
 	 */
-	public function getRepoTeams(Repository $repo) {
+	public function getRepoTeams(Repo $repo) {
 		$teams = $this->request(sprintf('repos/%s/%s/teams', $repo->owner, $repo->name));
 
 		return $teams;

@@ -12,7 +12,12 @@ use saiik\Request\{
 	Repository as RequestRepository,
 	Misc as MiscRequest,
 	User as UserRequest,
-	Organizations as OrganizationsRequest
+	Organizations as OrganizationsRequest,
+	Teams as TeamsRequest
+};
+use saiik\Github\{
+	Repository,
+	Commit
 };
 
 /**
@@ -22,7 +27,7 @@ use saiik\Request\{
  */
 class Github {
 
-	use RequestRepository, MiscRequest, UserRequest, OrganizationsRequest;
+	use RequestRepository, MiscRequest, UserRequest, OrganizationsRequest, TeamsRequest;
 
 	/**
 	 * @var GuzzleHttp\Client $client
@@ -104,13 +109,16 @@ class Github {
 
 	/**
 	 * Send a request to api
+	 * Set statusOnly to true to recieve only a status code (eg 200, 201 ..) useful for the new github membership api
 	 *
 	 * @param string $url
+	 * @param array $post
 	 * @param string $method
+	 * @param bool $statusOnly
 	 * @return array
 	 * @throws GithubException
 	 */
-	protected function request($url, $post = null, $method = self::METHOD_GET) {
+	protected function request($url, $post = null, $method = self::METHOD_GET, $statusOnly = false) {
 		$statusCode = 0;
 
 		switch($method) {
@@ -182,57 +190,60 @@ class Github {
 				return;
 			break;
 		}
+		if(!$statusOnly) {
+			if($statusCode === 0 && $request->getStatusCode() === self::STATUS_OK) {
+				$body = $request->getBody();
+				$content = $body->getContents();
 
-		if($statusCode === 0 && $request->getStatusCode() === self::STATUS_OK) {
-			$body = $request->getBody();
-			$content = $body->getContents();
+				$header = $request->getHeaders();
+				$type = explode(";", $header['Content-Type'][0]);
+				$type = $type[0];
 
-			$header = $request->getHeaders();
-			$type = explode(";", $header['Content-Type'][0]);
-			$type = $type[0];
-
-			switch($type) {
-				case 'application/json':
-					return json_decode($content);
-				break;
-				case 'text/html':
-					return $content;
-				break;
-				default:
-					return;
-				break;
-			}
-		} elseif($statusCode === 0 && $request->getStatusCode() == self::STATUS_ACCEPTED) {
-			return $this->request($url, $post, $method);
-		} elseif($statusCode === 0 && $request->getStatusCode() == self::STATUS_CREATED) {
-			return true;
-		} elseif($statusCode === 0 && $request->getStatusCode() == self::STATUS_NO_CONTENT) {
-			return true;
-		} else {
-			$statusCode = $statusCode = 0 ? $request->getStatusCode() : $statusCode;
-			switch((int)$statusCode) {
-				case self::STATUS_NOTFOUND:
-					throw new GithubException(
-						'Requested page not found '.PHP_EOL.' URL: ' . $url
-					);
-				break;
-				case self::STATUS_AUTH:
-					throw new GithubException(
-						'Invalid access token, please generate your access token here: https://github.com/settings/tokens'
-					);
-				break;
-				case self::STATUS_ENTITY:
-					throw new GithubException(
-						'Unprocessable Entity'
-					);
-				break;
-				default:
-					throw new GithubException(
-						'Status Code: ' . $statusCode
-					);
-				break;
+				switch($type) {
+					case 'application/json':
+						return json_decode($content);
+					break;
+					case 'text/html':
+						return $content;
+					break;
+					default:
+						return;
+					break;
+				}
+			} elseif($statusCode === 0 && $request->getStatusCode() == self::STATUS_ACCEPTED) {
+				return $this->request($url, $post, $method);
+			} elseif($statusCode === 0 && $request->getStatusCode() == self::STATUS_CREATED) {
+				return true;
+			} elseif($statusCode === 0 && $request->getStatusCode() == self::STATUS_NO_CONTENT) {
+				return true;
+			} else {
+				$statusCode = $statusCode = 0 ? $request->getStatusCode() : $statusCode;
+				switch((int)$statusCode) {
+					case self::STATUS_NOTFOUND:
+						throw new GithubException(
+							'Requested page not found '.PHP_EOL.' URL: ' . $url
+						);
+					break;
+					case self::STATUS_AUTH:
+						throw new GithubException(
+							'Invalid access token, please generate your access token here: https://github.com/settings/tokens'
+						);
+					break;
+					case self::STATUS_ENTITY:
+						throw new GithubException(
+							'Unprocessable Entity'
+						);
+					break;
+					default:
+						throw new GithubException(
+							'Status Code: ' . $statusCode
+						);
+					break;
+				}
 			}
 		}
+
+		return $statusCode == 0 ? $request->getStatusCode() : $statusCode;
 	}
 
 }

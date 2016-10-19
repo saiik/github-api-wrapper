@@ -81,4 +81,16 @@ trait Organizations {
 
 		return $delete;
 	}
+
+	/**
+	 * List teams for this organization
+	 *
+	 * @param string $org
+	 * @return array<\stdClass>
+	 */
+	public function getOrganizationTeams(string $org) {
+		$teams = $this->request(sprintf('orgs/%s/teams', $org));
+
+		return $teams ?? false;
+	}
 }

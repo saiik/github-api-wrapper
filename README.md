@@ -20,7 +20,7 @@ composer require saiik/github-api-wrapper
 
 Visit [Github settings](https://github.com/settings/tokens) to get a github access token.
 
-## Usage
+## Quickstart
 
 __Connect to github__
 ```php
@@ -29,15 +29,6 @@ require_once 'vendor/autoload.php';
 $token = 'YOUR_GITHUB_TOKEN';
 
 $github = new \saiik\Github($token);
-```
-
-__Get your user profile or a specifiy user profile__
-```php
-$me = $github->getUser();
-
-// OR
-
-$user = $github->getUser('someone');
 ```
 
 __Get all user repositories__
@@ -57,66 +48,9 @@ $repo = $github->getRepo('saiik', 'dodu');
 $commits = $github->getCommits($repo);
 ```
 
-__Get a specific commit__
-```php
-$repo = $github->getRepo('saiik', 'dodu');
-$commits = $github->getCommits($repo);
-$commit = $github->getCommit($commits[0]);
-```
-
-__Get README file from a repository__
-```php
-$repo = $github->getRepo('saiik', 'dodu');
-$readme = $github->getReadMe($repo);
-```
-
-__Parse README file__
-```php
-$repo = $github->getRepo('saiik', 'dodu');
-$readme = $github->getReadMe($repo);
-$parsed = $github->parseReadMe($readme); // post request to github
-```
-
-__Get the amount of codes lines for a repository__
-```php
-$repo = $github->getRepo('saiik', 'dodu');
-$count = $github->getRepoCodeCount($repo);
-```
-
-__Create a repository__
-```php
-$github->createRepository([
-	'name' => 'REPOSITORY_NAME'
-	/* .. Please visit https://developer.github.com/v3/repos/#create for more information about creating a repository .. */ 
-])
-```
-
-__Get all languages used in a repository__
-```php
-$repo = $github->getRepo('saiik', 'dodo-cms');
-var_dump($github->getRepoLanguages($repo));
-```
-
-__Get all contributors for a repository__
-```php
-$repo = $github->getRepo('saiik', 'dodo-cms');
-var_dump($github->getRepoContributors($repo));
-```
-
-__Get all teams for a repository__
-```php
-$repo = $github->getRepo('saiik', 'dodo-cms');
-var_dump($github->getRepoTeams($repo));
-```
-
-__Get your API rate limit__
-```php
-var_dump($github->getRateLimit());
-```
-
-__more coming soon__
-
 See? It's pretty easy and not overloaded.
+
+View the full documentation in the [wiki](https://github.com/saiik/github-api-wrapper/wiki).
 
 ## Changelog
 

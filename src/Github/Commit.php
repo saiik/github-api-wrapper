@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace saiik;
+namespace saiik\Github;
 
 /**
- * @package saiik\
+ * @package saiik\Github
  * @author Tobias Fuchs <saikon@hotmail.de>
  * @version 1.0
  */
