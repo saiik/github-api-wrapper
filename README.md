@@ -12,9 +12,13 @@ Connect to github and fetch user / repository data. It's __easy__ and __fast__!
 
 Run
 
-```
+```php
 composer require saiik/github-api-wrapper
 ```
+
+## Github Token
+
+Visit [Github settings](https://github.com/settings/tokens) to get a github access token.
 
 ## Usage
 

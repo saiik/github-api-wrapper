@@ -111,10 +111,11 @@ class Github {
 	 *
 	 * @param array $data
 	 * @return boolean
+	 * @throws \saiik\GithubException
 	 */
 	public function createRepository(array $data) {
 		if(!isset($data['name'])) 
-			return false;
+			throw new GithubException('Please provide a repository name');
 
 		$post = $this->request('user/repos', $data, self::METHOD_POST);
 
