@@ -53,6 +53,12 @@ class Github {
 	 */	
 	private $url;
 
+	/**
+	 * @var bool $triggerWarning
+	 *
+	 */
+	protected $triggerWarning;
+
 	const METHOD_GET = 'GET';
 	const METHOD_POST = 'POST';
 	const METHOD_PATCH = 'PATCH';
@@ -66,17 +72,30 @@ class Github {
 	const STATUS_CREATED = 201;
 	const STATUS_NO_CONTENT = 204;
 
-	public function __construct(string $token) {
+	public function __construct(string $token, bool $triggerWarning = true) {
 		if(is_null($token))
 			throw new GithubException('No auth token');
 
 		$this->token = $token;
+		$this->triggerWarning = $triggerWarning;
 
 		$this->client = new Client(
 			[
 				'base_uri' => $this->uri,
 			]
 		);
+
+		if($this->triggerWarning === true) {
+			$rateLimit = $this->getRateLimit();
+
+			$reset = $rateLimit->rate->reset;
+			$remaining = $rateLimit->rate->remaining;
+			$date = date("m-d-Y H:i", $reset);
+
+			if($remaining < 50) {
+				trigger_error("You have only " . $remaining . " api calls left until " . $date);
+			}
+		}
 	}
 
 	/**
