@@ -64,7 +64,7 @@ trait Repository {
 	 * Get last commits
 	 *
 	 * @param \saiik\Github\Repository $repo
-	 * @return array
+	 * @return array<\saiik\Github\Commit>
 	 */
 	public function getCommits(Repo $repo) {
 		$commits = $this->request(sprintf('repos/%s/%s/commits', $repo->owner, $repo->name));

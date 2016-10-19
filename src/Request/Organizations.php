@@ -36,6 +36,7 @@ trait Organizations {
 	/**
      * Get a specific organization
 	 *
+	 * @param string $org
 	 * @return \stdClass
 	 */
 	public function getOrganization(string $org) {

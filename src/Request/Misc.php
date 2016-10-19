@@ -50,7 +50,7 @@ trait Misc {
 	 * @param string $readMe
 	 * @return string
 	 */
-	public function parseReadMe(string $readMe) {
+	public function parseMarkdown(string $readMe) {
 		$post = $this->request('markdown', ['text' => $readMe], self::METHOD_POST);
 		
 		return $post;

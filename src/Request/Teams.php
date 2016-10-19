@@ -46,16 +46,16 @@ trait Teams {
 	/**
 	 * Edit a team 
 	 *
-	 * @param string $org
+	 * @param int $team
 	 * @param array $data
 	 * @return array
 	 * @throws GithubException
 	 */
-	public function editTeam(string $org, array $data) {
+	public function editTeam(int $team, array $data) {
 		if(!isset($data['name']))
 			throw new GithubException('Please provide a team name');
 
-		$team = $this->request(sprintf('orgs/%s/teams', $org), $data, self::METHOD_PATCH);
+		$team = $this->request(sprintf('teams/%u', $org), $data, self::METHOD_PATCH);
 
 		return $team ?? false;
 	}
@@ -76,7 +76,7 @@ trait Teams {
 	 * List all team members
 	 *
 	 * @param int $team
-	 * @return array<\stdObject>
+	 * @return array<\stdClass>
 	 */
 	public function getTeamMembers(int $team) {
 		$members = $this->request(sprintf('teams/%u/members', $team));
