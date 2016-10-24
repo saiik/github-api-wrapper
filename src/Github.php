@@ -9,7 +9,7 @@ use GuzzleHttp\{
 	Exception\ClientException
 };
 use saiik\Request\{
-	Repository as RequestRepository,
+	Repository as RepositoryRequest,
 	Misc as MiscRequest,
 	User as UserRequest,
 	Organizations as OrganizationsRequest,
@@ -27,7 +27,7 @@ use saiik\Github\{
  */
 class Github {
 
-	use RequestRepository, MiscRequest, UserRequest, OrganizationsRequest, TeamsRequest;
+	use RepositoryRequest, MiscRequest, UserRequest, OrganizationsRequest, TeamsRequest;
 
 	/**
 	 * @var GuzzleHttp\Client $client
@@ -62,6 +62,7 @@ class Github {
 	const METHOD_GET = 'GET';
 	const METHOD_POST = 'POST';
 	const METHOD_PATCH = 'PATCH';
+	const METHOD_PUT = 'PUT';
 	const METHOD_DELETE = 'DELETE';
 
 	const STATUS_OK = 200;
@@ -197,6 +198,21 @@ class Github {
 						$this->url ?? '' . $url,
 						[
 							'headers' => [
+								'Authorization' => sprintf('token %s', $this->token),
+							]
+						]
+					);
+				} catch(ClientException $e) {
+					$statusCode = $e->getResponse()->getStatusCode();
+				}
+			break;
+			case self::METHOD_PUT:
+				try {
+					$request = $this->client->put(
+						$this->url ?? '' . $url,
+						[	
+							'headers' => [
+								'Content-Lenght' => 0,
 								'Authorization' => sprintf('token %s', $this->token),
 							]
 						]

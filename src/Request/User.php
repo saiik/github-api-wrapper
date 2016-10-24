@@ -96,8 +96,9 @@ trait User {
 	}
 
 	/**
-	 * List my followers
+	 * List user followers
  	 *
+ 	 * @param string $user
 	 * @return array<\stdClass>
 	 */
 	public function listUserFollowers(string $user) {
@@ -107,8 +108,9 @@ trait User {
 	}
 
 	/**
-	 * List users which i follow
+	 * List users which user follow
 	 *
+	 * @param string $user
 	 * @return array<\stdClass>
 	 */
 	public function listUserFollowing(string $user) {
@@ -222,5 +224,70 @@ trait User {
 		$delete = $this->request(sprintf('user/gpg_keys/%u', $id), null, self::METHOD_DELETE);
 
 		return $delete;
+	}
+
+	/**
+	 * Check if you are following a specific user
+	 *
+	 * @param string $user
+	 * @return boolean
+	 */
+	public function meFollowing(string $user) {
+		$check = $this->request(sprintf('user/following/%s', $user), null, self::METHOD_GET, true);
+
+		switch($check) {
+			case self::STATUS_NOTFOUND:
+				return false;
+			break;
+			case self::STATUS_NO_CONTENT:
+			default:
+				return true;
+			break;
+		}
+	}
+
+	/**
+	 * Check if a specific user is following a specific user
+	 *
+	 * @param string $user
+	 * @param string $follow
+	 * @return boolean
+	 */
+	public function userFollowing(string $user, string $follow) {
+		$check = $this->request(sprintf('users/%s/following/%s', $user, $follow), null, self::METHOD_GET, true);
+
+		switch($check) {
+			case self::STATUS_NOTFOUND:
+				return false;
+			break;
+			case self::STATUS_NO_CONTENT:
+			default:
+				return true;
+			break;
+		}
+	}
+
+	/**
+	 * Follow a user
+	 *
+	 * @param string $user
+	 * @return boolean
+	 */
+	public function followUser(string $user) {
+		$follow = $this->request(sprintf('user/following/%s', $user), null, self::METHOD_PUT);
+
+		return $follow;
+	}
+
+	/**
+	 * Unfollow a user
+	 *
+	 * @param string $user
+	 * @return boolean
+	 */
+	public function unfollowUser(string $user) {
+		$follow = $this->request(sprintf('user/following/%s', $user), null, self::METHOD_DELETE);
+
+		return $follow;
 	}
 }
