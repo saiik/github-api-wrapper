@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace saiik\Request;
 
 use saiik\Github\{
-	Repository as Repo
+	Repository as Repo, Commit
 };
 
 /**
